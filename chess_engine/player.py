@@ -1,3 +1,5 @@
+import sys
+
 from abc import ABC
 from abc import abstractmethod
 
@@ -26,6 +28,28 @@ class Player(ABC):
     @abstractmethod
     def decide_move(self, board : Board) -> Move:
         pass
+
+class UserPlayer(Player):
+    def decide_move(self, board : Board) -> Move:
+        while True:
+            try:
+                command = input("> ")
+            except KeyboardInterrupt:
+                print()
+                continue
+            except EOFError:
+                sys.exit(0)
+            try:
+                move = board.parse_san(command)
+                break
+            except chess.InvalidMoveError:
+                print("Error: Invalid SAN string.")
+            except chess.IllegalMoveError:
+                print("Error: Illegal move.")
+            except chess.AmbiguousMoveError:
+                print("Error: Ambiguous move.")
+        return move
+
 
 class RandomPlayer(Player):
     def decide_move(self, board : Board) -> Move:
@@ -64,7 +88,7 @@ class AlphaBetaPlayer(Player):
         super().__init__(color)
         self.depth = depth
     
-    def min_max_value(self, map, board : Board, depth, alpha, beta):
+    def min_max_value(self, map : dict[chess.PieceType,int], board : Board, depth : int, alpha : int, beta : int) -> tuple[int,Move]:
         if depth == 0:
             return (self.calculate_value(board, map), None)
         legalMoves = list(board.generate_legal_moves())
@@ -75,7 +99,7 @@ class AlphaBetaPlayer(Player):
             succ_board.push(move)
             next_depth = depth - 1
             succ_value = self.min_max_value(map, succ_board, next_depth, alpha, beta)[0]
-            if succ_board.turn == self.color:
+            if succ_board.turn == chess.WHITE:
                 if (not best_move) or succ_value > best_value:
                     best_move = move
                     best_value = succ_value
