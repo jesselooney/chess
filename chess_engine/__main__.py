@@ -3,7 +3,7 @@ import sys
 import chess
 
 print(
-    "Welcome to terminal chess. Use standard algebraic notation (SAN) to control the board. Use Ctrl+D to exit the REPL."
+    "Welcome to terminal chess. Use standard algebraic notation (SAN) to control the board. Use Ctrl+C to exit the REPL."
 )
 
 board = chess.Board()
@@ -16,9 +16,6 @@ while True:
     try:
         command = input("> ")
     except KeyboardInterrupt:
-        print()
-        continue
-    except EOFError:
         sys.exit(0)
 
     if command == "u":

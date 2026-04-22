@@ -41,10 +41,8 @@ class UserPlayer(Player):
             try:
                 command = input("> ")
             except KeyboardInterrupt:
-                print()
-                continue
-            except EOFError:
                 sys.exit(0)
+
             try:
                 move = board.parse_san(command)
                 break
