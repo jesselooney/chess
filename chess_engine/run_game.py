@@ -1,5 +1,3 @@
-import math
-
 import chess
 
 from chess_engine.evaluations import piecewise_evaluation
@@ -33,4 +31,3 @@ if __name__ == "__main__":
     outcome = play_game(board, [user, negamax])
 
     print(outcome)
-

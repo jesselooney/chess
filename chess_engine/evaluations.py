@@ -2,9 +2,6 @@ import math
 
 import chess
 
-import chess_engine.player as player
-from chess_engine.negamax import NegamaxPlayer
-
 
 def outcome_evaluation(outcome: chess.Outcome) -> float:
     if outcome.winner is None:
@@ -37,4 +34,3 @@ def piecewise_evaluation(board: chess.Board) -> float:
             value -= pieceValue
 
     return value
-

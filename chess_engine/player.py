@@ -9,15 +9,21 @@ from chess import Move
 
 import random
 
+
 class Player(ABC):
     def __init__(self):
         super().__init__()
-    
-    def calculate_value(self, piece_values : dict[chess.PieceType,int], board : Board, my_color : chess.Color) -> int:
-        total_value : int = 0
+
+    def calculate_value(
+        self,
+        piece_values: dict[chess.PieceType, int],
+        board: Board,
+        my_color: chess.Color,
+    ) -> int:
+        total_value: int = 0
         for piece in board.piece_map().values():
             val = piece_values.get(piece.piece_type, 0)
-            
+
             if piece.color == my_color:
                 total_value += val
             else:
@@ -25,11 +31,12 @@ class Player(ABC):
         return total_value
 
     @abstractmethod
-    def decide_move(self, board : Board) -> Move:
+    def decide_move(self, board: Board) -> Move | None:
         pass
 
+
 class UserPlayer(Player):
-    def decide_move(self, board : Board) -> Move:
+    def decide_move(self, board: Board) -> Move:
         while True:
             try:
                 command = input("> ")
@@ -51,19 +58,20 @@ class UserPlayer(Player):
 
 
 class RandomPlayer(Player):
-    def decide_move(self, board : Board) -> Move:
+    def decide_move(self, board: Board) -> Move:
         possible_moves = list(board.generate_legal_moves())
         return random.choice(possible_moves)
 
+
 class SimplePlayer(Player):
-    def decide_move(self, board : Board) -> Move:
-        piece_values : dict[chess.PieceType,int] = {
-            chess.PAWN:1,
-            chess.BISHOP:3,
-            chess.KNIGHT:3,
-            chess.ROOK:5,
-            chess.QUEEN:9,
-            chess.KING:100,
+    def decide_move(self, board: Board) -> Move:
+        piece_values: dict[chess.PieceType, int] = {
+            chess.PAWN: 1,
+            chess.BISHOP: 3,
+            chess.KNIGHT: 3,
+            chess.ROOK: 5,
+            chess.QUEEN: 9,
+            chess.KING: 100,
         }
         my_color = board.turn
 
@@ -82,12 +90,21 @@ class SimplePlayer(Player):
         print(best_value)
         return random.choice(best_moves)
 
+
 class AlphaBetaPlayer(Player):
-    def __init__(self, depth : int):
+    def __init__(self, depth: int):
         super().__init__()
         self.depth = depth
-    
-    def min_max_value(self, piece_values : dict[chess.PieceType,int], board : Board, my_color : chess.Color, depth : int, alpha : int, beta : int) -> tuple[int,Move]:
+
+    def min_max_value(
+        self,
+        piece_values: dict[chess.PieceType, int],
+        board: Board,
+        my_color: chess.Color,
+        depth: int,
+        alpha: int,
+        beta: int,
+    ) -> tuple[int, Move]:
         if depth == 0:
             return (self.calculate_value(piece_values, board, my_color), None)
         legalMoves = list(board.generate_legal_moves())
@@ -97,7 +114,9 @@ class AlphaBetaPlayer(Player):
             succ_board = board.copy()
             succ_board.push(move)
             next_depth = depth - 1
-            succ_value = self.min_max_value(piece_values, succ_board, my_color, next_depth, alpha, beta)[0]
+            succ_value = self.min_max_value(
+                piece_values, succ_board, my_color, next_depth, alpha, beta
+            )[0]
             if succ_board.turn == chess.WHITE:
                 if (not best_move) or succ_value > best_value:
                     best_move = move
@@ -122,13 +141,15 @@ class AlphaBetaPlayer(Player):
             return (self.calculate_value(piece_values, board, my_color), None)
         return (best_value, best_move)
 
-    def decide_move(self, board : Board) -> Move:
-        piece_values : dict[chess.PieceType,int] = {
-            chess.PAWN:1,
-            chess.BISHOP:3,
-            chess.KNIGHT:3,
-            chess.ROOK:5,
-            chess.QUEEN:9,
-            chess.KING:100,
+    def decide_move(self, board: Board) -> Move:
+        piece_values: dict[chess.PieceType, int] = {
+            chess.PAWN: 1,
+            chess.BISHOP: 3,
+            chess.KNIGHT: 3,
+            chess.ROOK: 5,
+            chess.QUEEN: 9,
+            chess.KING: 100,
         }
-        return self.min_max_value(piece_values, board, board.turn, self.depth, None, None)[1]
+        return self.min_max_value(
+            piece_values, board, board.turn, self.depth, None, None
+        )[1]

@@ -6,10 +6,16 @@ import chess
 import chess_engine.player as player
 
 
-def negamax(evaluation: Callable[[chess.Board], float], board: chess.Board, depth: int, alpha: float, beta: float) -> tuple[float, chess.Move]:
+def negamax(
+    evaluation: Callable[[chess.Board], float],
+    board: chess.Board,
+    depth: int,
+    alpha: float,
+    beta: float,
+) -> tuple[float, chess.Move | None]:
     if depth == 0 or board.is_game_over():
         return (evaluation(board), None)
-    
+
     moves = board.legal_moves
 
     value = -math.inf
@@ -40,6 +46,5 @@ class NegamaxPlayer(player.Player):
         assert depth > 0
         self.depth = depth
 
-    def decide_move(self, board: chess.Board) -> chess.Move:
+    def decide_move(self, board: chess.Board) -> chess.Move | None:
         return negamax(self.evaluation, board, self.depth, -math.inf, math.inf)[1]
-
