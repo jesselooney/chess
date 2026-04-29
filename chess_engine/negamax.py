@@ -5,16 +5,18 @@ import chess
 
 import chess_engine.player as player
 
+from chess_engine.evaluations import Evaluator
+
 
 def negamax(
-    evaluation: Callable[[chess.Board], float],
+    evaluator: Evaluator,
     board: chess.Board,
     depth: int,
     alpha: float,
     beta: float,
 ) -> tuple[float, chess.Move | None]:
     if depth == 0 or board.is_game_over():
-        return (evaluation(board), None)
+        return (evaluator.evaluate(board), None)
 
     moves = board.legal_moves
 
@@ -23,7 +25,7 @@ def negamax(
 
     for move in moves:
         board.push(move)
-        moveValue = -negamax(evaluation, board, depth - 1, -beta, -alpha)[0]
+        moveValue = -negamax(evaluator, board, depth - 1, -beta, -alpha)[0]
         board.pop()
 
         if moveValue > value:
@@ -38,13 +40,13 @@ def negamax(
 
 
 class NegamaxPlayer(player.Player):
-    def __init__(self, evaluation: Callable[[chess.Board], float], depth: int):
+    def __init__(self, evaluator: Evaluator, depth: int):
         super().__init__()
 
-        self.evaluation = evaluation
+        self.evaluator = evaluator
 
         assert depth > 0
         self.depth = depth
 
     def decide_move(self, board: chess.Board) -> chess.Move | None:
-        return negamax(self.evaluation, board, self.depth, -math.inf, math.inf)[1]
+        return negamax(self.evaluator, board, self.depth, -math.inf, math.inf)[1]
