@@ -76,3 +76,32 @@ class FavorCenterEvaluator(Evaluator):
                 value -= pieceValue
 
         return value
+    
+class FavorAggression(Evaluator):
+    def evaluate(self, board: chess.Board) -> float:
+        outcome = board.outcome()
+        if outcome is not None:
+            return self.evaluate_outcome(outcome)
+
+        piece_values = {
+            chess.PAWN: 1,
+            chess.KNIGHT: 3,
+            chess.BISHOP: 3,
+            chess.ROOK: 5,
+            chess.QUEEN: 9,
+        }
+
+        value = 0
+        for square in board.piece_map().keys():
+            piece : chess.Piece = board.piece_map()[square]
+            pieceValue = piece_values.get(piece.piece_type, 0)
+            # determine goal for file based on player color
+            distance : float = math.dist(chess_util.square_to_coordinates(square), (7.5, 4.5) if piece.color == chess.WHITE else (0.5, 4.5))
+            distanceMultiplier : float = 1.0 + (0.1 / distance)
+            pieceValue *= distanceMultiplier
+            if piece.color == board.turn:
+                value += pieceValue
+            else:
+                value -= pieceValue
+
+        return value
