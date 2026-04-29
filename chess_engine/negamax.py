@@ -56,4 +56,6 @@ class NegamaxPlayer(player.Player):
         self.depth = depth
 
     def decide_move(self, board: chess.Board) -> chess.Move | None:
-        return negamax(self.evaluator, board, self.depth, -math.inf, math.inf)[1]
+        result = negamax(self.evaluator, board, self.depth, -math.inf, math.inf)
+        print("Best score: " + str(result[0]))
+        return result[1]
