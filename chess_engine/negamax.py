@@ -15,9 +15,9 @@ def negamax(
     depth: int,
     alpha: float,
     beta: float,
-) -> tuple[float, chess.Move | None]:
+) -> tuple[float, chess.Move | None, int]:
     if depth == 0 or board.is_game_over():
-        return (evaluator.evaluate(board), None)
+        return (evaluator.evaluate(board), None, depth)
 
     moves = board.legal_moves
 
@@ -26,13 +26,17 @@ def negamax(
 
     for move in moves:
         board.push(move)
-        moveValue = -negamax(evaluator, board, depth - 1, -beta, -alpha)[0]
+        negamax_result = negamax(evaluator, board, depth - 1, -beta, -alpha)
+        moveValue = -negamax_result[0]
         board.pop()
 
         if not bestMove:
             value = moveValue
             bestMove = move
         elif moveValue > value:
+            value = moveValue
+            bestMove = move
+        elif moveValue == value and negamax_result[2] >= depth:
             value = moveValue
             bestMove = move
         elif moveValue == value and random.random() > 0.5:
@@ -43,7 +47,7 @@ def negamax(
         if alpha >= beta:
             break
 
-    return (value, bestMove)
+    return (value, bestMove, depth)
 
 
 class NegamaxPlayer(player.Player):
