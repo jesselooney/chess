@@ -1,50 +1,62 @@
 import math
+import random
 from typing import Callable
 
 import chess
 
 import chess_engine.player as player
 
+from chess_engine.evaluations import Evaluator
+
 
 def negamax(
-    evaluation: Callable[[chess.Board], float],
+    evaluator: Evaluator,
     board: chess.Board,
     depth: int,
     alpha: float,
     beta: float,
-) -> tuple[float, chess.Move | None]:
+) -> tuple[float, chess.Move | None, int]:
     if depth == 0 or board.is_game_over():
-        return (evaluation(board), None)
+        return (evaluator.evaluate(board), None, depth)
 
-    moves = board.legal_moves
+    moves = list(board.generate_legal_moves())
+
+    random.shuffle(moves)
 
     value = -math.inf
     bestMove = None
+    bestDepth = 0
 
     for move in moves:
         board.push(move)
-        moveValue = -negamax(evaluation, board, depth - 1, -beta, -alpha)[0]
+        negamax_result = negamax(evaluator, board, depth - 1, -beta, -alpha)
+        moveValue = -negamax_result[0]
         board.pop()
 
-        if moveValue > value:
+        if (not bestMove
+            or moveValue > value
+            or (moveValue == value and negamax_result[2] > bestDepth)):
             value = moveValue
             bestMove = move
+            bestDepth = negamax_result[2]
 
         alpha = max(alpha, value)
         if alpha >= beta:
             break
 
-    return (value, bestMove)
+    return (value, bestMove, bestDepth)
 
 
 class NegamaxPlayer(player.Player):
-    def __init__(self, evaluation: Callable[[chess.Board], float], depth: int):
+    def __init__(self, evaluator: Evaluator, depth: int):
         super().__init__()
 
-        self.evaluation = evaluation
+        self.evaluator = evaluator
 
         assert depth > 0
         self.depth = depth
 
     def decide_move(self, board: chess.Board) -> chess.Move | None:
-        return negamax(self.evaluation, board, self.depth, -math.inf, math.inf)[1]
+        result = negamax(self.evaluator, board, self.depth, -math.inf, math.inf)
+        print("Best score: " + str(result[0]))
+        return result[1]

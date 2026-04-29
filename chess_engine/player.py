@@ -8,27 +8,14 @@ from chess import Board
 from chess import Move
 
 import random
+import math
+
+from chess_engine.evaluations import Evaluator
 
 
 class Player(ABC):
     def __init__(self):
         super().__init__()
-
-    def calculate_value(
-        self,
-        piece_values: dict[chess.PieceType, int],
-        board: Board,
-        my_color: chess.Color,
-    ) -> int:
-        total_value: int = 0
-        for piece in board.piece_map().values():
-            val = piece_values.get(piece.piece_type, 0)
-
-            if piece.color == my_color:
-                total_value += val
-            else:
-                total_value -= val
-        return total_value
 
     @abstractmethod
     def decide_move(self, board: Board) -> Move | None:
@@ -62,36 +49,33 @@ class RandomPlayer(Player):
 
 
 class SimplePlayer(Player):
-    def decide_move(self, board: Board) -> Move:
-        piece_values: dict[chess.PieceType, int] = {
-            chess.PAWN: 1,
-            chess.BISHOP: 3,
-            chess.KNIGHT: 3,
-            chess.ROOK: 5,
-            chess.QUEEN: 9,
-            chess.KING: 100,
-        }
-        my_color = board.turn
+    def __init__(self, evaluator: Evaluator):
+        super().__init__()
 
+        self.evaluator = evaluator
+
+    def decide_move(self, board: Board) -> Move:
         possible_moves = list(board.generate_legal_moves())
-        best_value = None
-        best_moves = []
+        random.shuffle(possible_moves)
+        best_value = -math.inf
+        best_move = None
         for move in possible_moves:
             board.push(move)
-            value = self.calculate_value(piece_values, board, my_color)
-            if (not best_value) or (value > best_value):
-                best_value = value
-                best_moves = [move]
-            elif value == best_value:
-                best_moves.append(move)
+            value = - self.evaluator.evaluate(board)
             board.pop()
-        print(best_value)
-        return random.choice(best_moves)
+            if (not best_move) or (value > best_value):
+                best_value = value
+                best_move = move
+        return best_move
 
 
 class AlphaBetaPlayer(Player):
-    def __init__(self, depth: int):
+    def __init__(self, evaluator: Evaluator, depth: int):
         super().__init__()
+
+        self.evaluator = evaluator
+
+        assert depth > 0
         self.depth = depth
 
     def min_max_value(
@@ -104,7 +88,7 @@ class AlphaBetaPlayer(Player):
         beta: int,
     ) -> tuple[int, Move]:
         if depth == 0:
-            return (self.calculate_value(piece_values, board, my_color), None)
+            return (self.evaluator.evaluate(board), None)
         legalMoves = list(board.generate_legal_moves())
         best_move = None
         best_value = 0
@@ -136,7 +120,7 @@ class AlphaBetaPlayer(Player):
                 if alpha and best_value < alpha:
                     return (best_value, best_move)
         if not best_move:
-            return (self.calculate_value(piece_values, board, my_color), None)
+            return (self.evaluator.evaluate(board), None)
         return (best_value, best_move)
 
     def decide_move(self, board: Board) -> Move:
