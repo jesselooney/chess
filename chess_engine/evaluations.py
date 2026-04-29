@@ -98,7 +98,7 @@ class FavorAggression(Evaluator):
             # determine goal for file based on player color
             distance : float = math.dist(chess_util.square_to_coordinates(square), (7.5, 4.5) if piece.color == chess.WHITE else (0.5, 4.5))
             distanceMultiplier : float = 1.0 + (0.1 / distance)
-            pieceValue *= distanceMultiplier
+            pieceValue += distanceMultiplier
             if piece.color == board.turn:
                 value += pieceValue
             else:

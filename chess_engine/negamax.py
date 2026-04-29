@@ -1,4 +1,5 @@
 import math
+import random
 from typing import Callable
 
 import chess
@@ -28,7 +29,13 @@ def negamax(
         moveValue = -negamax(evaluator, board, depth - 1, -beta, -alpha)[0]
         board.pop()
 
-        if moveValue > value:
+        if not bestMove:
+            value = moveValue
+            bestMove = move
+        elif moveValue > value:
+            value = moveValue
+            bestMove = move
+        elif moveValue == value and random.random() > 0.5:
             value = moveValue
             bestMove = move
 
