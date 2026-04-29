@@ -1,10 +1,11 @@
+import argparse
 import csv
 from typing import Generator, Dict
 from pathlib import Path
 
 from chess import Board, Move
 
-from chess_engine.evaluations import piecewise_evaluation
+from chess_engine.evaluations import piecewise_evaluation, positional_evaluation
 from chess_engine.negamax import NegamaxPlayer
 from chess_engine.player import Player
 
@@ -45,6 +46,8 @@ def test_puzzles(player, puzzles_path: Path):
         fen = puzzle["FEN"]
         moves_str = puzzle["Moves"]
 
+        print(f"Checking {identifier}", end="\r")
+
         board = Board(fen)
         moves = [Move.from_uci(uci_str) for uci_str in moves_str.split(" ")]
 
@@ -67,6 +70,10 @@ def test_puzzles(player, puzzles_path: Path):
 
 
 if __name__ == "__main__":
-    player = NegamaxPlayer(piecewise_evaluation, 5)
-    puzzles_path = Path("puzzles100.csv")
-    test_puzzles(player, puzzles_path)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("puzzles_path", type=Path)
+
+    args = parser.parse_args()
+
+    player = NegamaxPlayer(positional_evaluation, 5)
+    test_puzzles(player, args.puzzles_path)
