@@ -68,8 +68,8 @@ class FavorCenterEvaluator(Evaluator):
             piece : chess.Piece = board.piece_map()[square]
             pieceValue = piece_values.get(piece.piece_type, 0)
             centerDistance : float = math.dist(chess_util.square_to_coordinates(square), (4.5,4.5))
-            distanceMultiplier : float = 1.0 + (0.1 / centerDistance)
-            pieceValue *= distanceMultiplier
+            distanceBonus : float = 0.1 / centerDistance
+            pieceValue += distanceBonus
             if piece.color == board.turn:
                 value += pieceValue
             else:
