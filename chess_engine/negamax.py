@@ -19,10 +19,13 @@ def negamax(
     if depth == 0 or board.is_game_over():
         return (evaluator.evaluate(board), None, depth)
 
-    moves = board.legal_moves
+    moves = list(board.generate_legal_moves())
+
+    random.shuffle(moves)
 
     value = -math.inf
     bestMove = None
+    bestDepth = 0
 
     for move in moves:
         board.push(move)
@@ -30,24 +33,18 @@ def negamax(
         moveValue = -negamax_result[0]
         board.pop()
 
-        if not bestMove:
+        if (not bestMove
+            or moveValue > value
+            or (moveValue == value and negamax_result[2] > bestDepth)):
             value = moveValue
             bestMove = move
-        elif moveValue > value:
-            value = moveValue
-            bestMove = move
-        elif moveValue == value and negamax_result[2] >= depth:
-            value = moveValue
-            bestMove = move
-        elif moveValue == value and random.random() > 0.5:
-            value = moveValue
-            bestMove = move
+            bestDepth = negamax_result[2]
 
         alpha = max(alpha, value)
         if alpha >= beta:
             break
 
-    return (value, bestMove, depth)
+    return (value, bestMove, bestDepth)
 
 
 class NegamaxPlayer(player.Player):

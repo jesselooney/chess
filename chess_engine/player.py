@@ -8,6 +8,7 @@ from chess import Board
 from chess import Move
 
 import random
+import math
 
 from chess_engine.evaluations import Evaluator
 
@@ -55,18 +56,17 @@ class SimplePlayer(Player):
 
     def decide_move(self, board: Board) -> Move:
         possible_moves = list(board.generate_legal_moves())
-        best_value = None
-        best_moves = []
+        random.shuffle(possible_moves)
+        best_value = -math.inf
+        best_move = None
         for move in possible_moves:
             board.push(move)
-            value = self.evaluator.evaluate(board)
-            if (not best_value) or (value > best_value):
-                best_value = value
-                best_moves = [move]
-            elif value == best_value:
-                best_moves.append(move)
+            value = - self.evaluator.evaluate(board)
             board.pop()
-        return random.choice(best_moves)
+            if (not best_move) or (value > best_value):
+                best_value = value
+                best_move = move
+        return best_move
 
 
 class AlphaBetaPlayer(Player):
