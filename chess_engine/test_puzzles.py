@@ -5,7 +5,7 @@ from pathlib import Path
 
 from chess import Board, Move
 
-from chess_engine.evaluations import piecewise_evaluation, positional_evaluation
+from chess_engine.evaluations import positional_evaluation
 from chess_engine.negamax import NegamaxPlayer
 from chess_engine.player import Player
 

@@ -1,4 +1,3 @@
-import sys
 
 import chess
 
@@ -50,7 +49,7 @@ def play_game(players : dict[chess.Color,player.Player]) -> chess.Outcome:
         except chess.AmbiguousMoveError:
             print("Error: Ambiguous move.")
         outcome = board.outcome()
-        if outcome != None:
+        if outcome is not None:
             break
     print(outcome)
 

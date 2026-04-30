@@ -71,7 +71,7 @@ def attack_features(board : chess.Board) -> tuple[float, float]:
         attacked_squares = board.attacks(square)
         for attacked_square in attacked_squares:
             if attacked_piece := board.piece_map().get(attacked_square):
-                piece_value = piece_values.get(piece.piece_type)
+                # piece_value = piece_values.get(piece.piece_type)
                 attacked_piece_value = piece_values.get(attacked_piece.piece_type)
                 
                 score = attacked_piece_value # / piece_value
@@ -79,7 +79,7 @@ def attack_features(board : chess.Board) -> tuple[float, float]:
                     score *= -1
 
                 # TODO: Consider giving diminishing returns for more attacks
-                # from the same piece.
+                # from the same piece?
                 if attacked_piece.color == piece.color:
                     defense_value += score
                 else:
