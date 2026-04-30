@@ -55,6 +55,38 @@ def aggression_evaluation(board : chess.Board) -> float:
 
     return value
 
+def attack_features(board : chess.Board) -> tuple[float, float]:
+    piece_values = {
+        chess.PAWN: 1,
+        chess.KNIGHT: 3,
+        chess.BISHOP: 3,
+        chess.ROOK: 5,
+        chess.QUEEN: 9,
+        chess.KING: 10,
+    }
+
+    attack_value = 0
+    defense_value = 0
+    for square, piece in board.piece_map().items():
+        attacked_squares = board.attacks(square)
+        for attacked_square in attacked_squares:
+            if attacked_piece := board.piece_map().get(attacked_square):
+                piece_value = piece_values.get(piece.piece_type)
+                attacked_piece_value = piece_values.get(attacked_piece.piece_type)
+                
+                score = attacked_piece_value # / piece_value
+                if piece.color != board.turn:
+                    score *= -1
+
+                # TODO: Consider giving diminishing returns for more attacks
+                # from the same piece.
+                if attacked_piece.color == piece.color:
+                    defense_value += score
+                else:
+                    attack_value += score
+    return (attack_value, defense_value)
+
+
 class Evaluator(ABC):
 
     def evaluate_outcome(self, outcome: Outcome) -> float:
@@ -112,31 +144,23 @@ class FavorAggressionEvaluator(Evaluator):
 
         return piece_evaluation(board) + 0.1 * aggression_evaluation(board)
 
-class FavorAggression(Evaluator):
-    def evaluate(self, board: chess.Board) -> float:
+class FavorAttackEvaluator(Evaluator):
+    def evaluate(self, board: Board) -> float:
         outcome = board.outcome()
         if outcome is not None:
             return self.evaluate_outcome(outcome)
 
-        piece_values = {
-            chess.PAWN: 1,
-            chess.KNIGHT: 3,
-            chess.BISHOP: 3,
-            chess.ROOK: 5,
-            chess.QUEEN: 9,
-        }
+        attack_value, defense_value = attack_features(board)
 
-        value = 0
-        for square in board.piece_map().keys():
-            piece : chess.Piece = board.piece_map()[square]
-            pieceValue = piece_values.get(piece.piece_type, 0)
-            # determine goal for file based on player color
-            distance : float = math.dist(chess_util.square_to_coordinates(square), (4.5, 7.5) if piece.color == chess.WHITE else (4.5, 0.5))
-            distanceMultiplier : float = 1.0 + (0.1 / distance)
-            pieceValue += distanceMultiplier
-            if piece.color == board.turn:
-                value += pieceValue
-            else:
-                value -= pieceValue
+        return piece_evaluation(board) + 0.0001 * attack_value
 
-        return value
+class FavorCenterAttackEvaluator(Evaluator):
+    def evaluate(self, board: Board) -> float:
+        outcome = board.outcome()
+        if outcome is not None:
+            return self.evaluate_outcome(outcome)
+
+        attack_value, defense_value = attack_features(board)
+
+        return piece_evaluation(board) + 0.001 * center_evaluation(board) + 0.0001 * attack_value
+
