@@ -1,4 +1,3 @@
-
 import chess
 
 import chess_engine.player as player
@@ -13,13 +12,14 @@ print(
 
 
 players = {
-    chess.WHITE:negamax.NegamaxPlayer(evaluations.FavorAggressionEvaluator(),2),
-    chess.BLACK:negamax.NegamaxPlayer(evaluations.FavorCenterEvaluator(),2)
+    chess.WHITE: negamax.NegamaxPlayer(evaluations.FavorAggressionEvaluator(), 2),
+    chess.BLACK: negamax.NegamaxPlayer(evaluations.FavorCenterEvaluator(), 2),
 }
 
 scores = Counter()
 
-def play_game(players : dict[chess.Color,player.Player]) -> chess.Outcome:
+
+def play_game(players: dict[chess.Color, player.Player]) -> chess.Outcome:
     board = chess.Board()
 
     outcome = None
@@ -36,7 +36,7 @@ def play_game(players : dict[chess.Color,player.Player]) -> chess.Outcome:
         print("BLACK: " + str(black_eval))
         print("-" * 15)
 
-        current_player : player.Player = players[board.turn]
+        current_player: player.Player = players[board.turn]
 
         move = current_player.decide_move(board)
 
@@ -58,6 +58,7 @@ def play_game(players : dict[chess.Color,player.Player]) -> chess.Outcome:
     print("-" * 15)
 
     return outcome
+
 
 for x in range(100):
     outcome = play_game(players)

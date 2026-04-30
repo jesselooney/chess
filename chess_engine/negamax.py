@@ -32,9 +32,11 @@ def negamax(
         moveValue = -negamax_result[0]
         board.pop()
 
-        if (not bestMove
+        if (
+            not bestMove
             or moveValue > value
-            or (moveValue == value and negamax_result[2] > bestDepth)):
+            or (moveValue == value and negamax_result[2] > bestDepth)
+        ):
             value = moveValue
             bestMove = move
             bestDepth = negamax_result[2]

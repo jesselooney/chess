@@ -61,7 +61,7 @@ class SimplePlayer(Player):
         best_move = None
         for move in possible_moves:
             board.push(move)
-            value = - self.evaluator.evaluate(board)
+            value = -self.evaluator.evaluate(board)
             board.pop()
             if (not best_move) or (value > best_value):
                 best_value = value
