@@ -64,12 +64,14 @@ class MCTSPlayer(Player):
     def __init__(
         self,
         evaluator: Evaluator,
+        policy: Player,
         rollout_count: int,
         rollout_max_depth: int | None = None,
     ):
         super().__init__()
 
         self.evaluator: Evaluator = evaluator
+        self.policy: Player = policy
 
         self.rollout_count: int = rollout_count
 
@@ -116,8 +118,8 @@ class MCTSPlayer(Player):
         my_color = board.turn
 
         depth = 0
-        while (moves := list(board.legal_moves)) and depth < self.rollout_max_depth:
-            move = random.choice(moves)
+        while not board.is_game_over() and depth < self.rollout_max_depth:
+            move = self.policy.decide_move(board)
             board.push(move)
             depth += 1
 

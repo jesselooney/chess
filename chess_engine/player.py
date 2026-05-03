@@ -47,6 +47,23 @@ class RandomPlayer(Player):
         possible_moves = list(board.generate_legal_moves())
         return random.choice(possible_moves)
 
+class EpsilonGreedyPlayer(Player):
+    def __init__(self, policy: Player, epsilon: float):
+        super().__init__()
+
+        self.policy: Player = policy
+
+        # A number in the range [0, 1] indicating the probability of making a
+        # random move.
+        self.epsilon: float = epsilon
+
+    def decide_move(self, board: Board) -> Move:
+        if random.random() < self.epsilon:
+            # Make a random move.
+            return random.choice(list(board.legal_moves))
+        else:
+            # Follow the policy.
+            return self.policy.decide_move(board)
 
 class SimplePlayer(Player):
     def __init__(self, evaluator: Evaluator):
