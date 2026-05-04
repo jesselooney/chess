@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from collections import defaultdict
 from collections.abc import Mapping
+import sys
 from time import perf_counter
 
 import chess
@@ -123,8 +124,14 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("white")
     parser.add_argument("black")
+    parser.add_argument("-p", "--print-players", action="store_true")
 
     args = parser.parse_args()
+
+    if args.print_players:
+        for player in PLAYERS.keys():
+            print(player)
+        sys.exit(0)
 
     white_player = args.white
     black_player = args.black
@@ -143,7 +150,6 @@ if __name__ == "__main__":
 
     white_clock = clocks[chess.WHITE]
     black_clock = clocks[chess.BLACK]
-
     print(
         f"white={white_player},black={black_player},winner={winner_str},reason={reason},white_moves={white_moves},black_moves={black_moves},white_clock={white_clock},black_clock={black_clock}"
     )
