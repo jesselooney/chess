@@ -1,3 +1,5 @@
+# Written with assistance from Google Gemini.
+
 import altair as alt
 import pandas as pd
 from pathlib import Path
