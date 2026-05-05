@@ -1,0 +1,19 @@
+$winner == "null"  {$score = 0}
+$winner == "white" {$score = 1}
+$winner == "black" {$score = -1}
+
+$white == "mcts-center-full-1000-random" {$white = "mcts-full-1k-random"}
+$white == "mcts-center-10-10000-random" {$white = "mcts-10-10k-random"}
+$white == "mcts-center-05-10000-random" {$white = "mcts-05-10k-random"}
+$white == "mcts-center-10-10000-epsilon-75-nega-pieces-1" {$white = "mcts-10-10k-epsilon-75"}
+$white == "mcts-center-10-10000-epsilon-95-nega-pieces-1" {$white = "mcts-10-10k-epsilon-95"}
+$white == "mcts-center-05-10000-epsilon-75-nega-pieces-1" {$white = "mcts-05-10k-epsilon-75"}
+$white == "mcts-center-05-10000-epsilon-95-nega-pieces-1" {$white = "mcts-05-10k-epsilon-95"}
+
+$black == "mcts-center-full-1000-random" {$black = "mcts-full-1k-random"}
+$black == "mcts-center-10-10000-random" {$black = "mcts-10-10k-random"}
+$black == "mcts-center-05-10000-random" {$black = "mcts-05-10k-random"}
+$black == "mcts-center-10-10000-epsilon-75-nega-pieces-1" {$black = "mcts-10-10k-epsilon-75"}
+$black == "mcts-center-10-10000-epsilon-95-nega-pieces-1" {$black = "mcts-10-10k-epsilon-95"}
+$black == "mcts-center-05-10000-epsilon-75-nega-pieces-1" {$black = "mcts-05-10k-epsilon-75"}
+$black == "mcts-center-05-10000-epsilon-95-nega-pieces-1" {$black = "mcts-05-10k-epsilon-95"}
